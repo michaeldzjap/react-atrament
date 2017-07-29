@@ -50,6 +50,8 @@ class Sketcher extends Component {
         if (!this.props.width || !this.props.height) {
             window.removeEventListener('resize', this._callScrollHandler);
         }
+
+        this._sketcher.destroy();
     }
 
     handleScroll() {
