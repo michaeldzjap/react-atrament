@@ -10,8 +10,7 @@ class Sketcher extends Component {
     static propTypes = {
         width: PropTypes.number,
         height: PropTypes.number,
-        onDirty: PropTypes.func,
-        onResize: PropTypes.func
+        onDirty: PropTypes.func
     }
 
     constructor(props) {
