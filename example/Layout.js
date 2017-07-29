@@ -19,7 +19,7 @@ class Layout extends Component {
                             <Controls />
                         </div>
                         <div className="column">
-                            <Sketcher ref={ref => this.sketcher = ref} />
+                            <Sketcher onDirty={e => console.log(e)} ref={ref => this.sketcher = ref} />
                         </div>
                     </div>
                 </div>

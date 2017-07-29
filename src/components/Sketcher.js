@@ -1,14 +1,17 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Atrament } from 'atrament';
+import { debounce } from 'throttle-debounce';
 
 class Sketcher extends Component {
+
+    static displayName = 'react-atrament';
 
     static propTypes = {
         width: PropTypes.number,
         height: PropTypes.number,
-        color: PropTypes.string,
-        onDirty: PropTypes.func
+        onDirty: PropTypes.func,
+        onResize: PropTypes.func
     }
 
     constructor(props) {
@@ -16,40 +19,75 @@ class Sketcher extends Component {
 
         this.state = {width: props.width, height: props.height};
         this._callDirtyHandler = this.handleDirty.bind(this);
+        this._callScrollHandler = debounce(150, this.handleScroll.bind(this));
     }
 
     componentDidMount() {
-        this.calculateDimensions();
+        if (!this.props.width) {
+            this._canvas.style.width = '100%';
+        }
+        if (!this.props.height) {
+            this._canvas.style.height = '100%';
+        }
+        this.scaleCanvas();
 
         if (this.props.onDirty && typeof this.props.onDirty === 'function') {
-            this.canvas.addEventListener('dirty', this._callDirtyHandler);
+            this._canvas.addEventListener('dirty', this._callDirtyHandler);
         }
-        this._sketcher = new Atrament(this.canvas);
+
+        if (!this.props.width || !this.props.height) {
+            window.addEventListener('resize', this._callScrollHandler);
+        }
+
+        this._sketcher = new Atrament(this._canvas, this._canvas.offsetWidth, this._canvas.offsetHeight);
     }
 
     componentWillUnmount() {
         if (this.props.onDirty && typeof this.props.onDirty === 'function') {
-            this.canvas.removeEventListener('dirty', this._callDirtyHandler);
+            this._canvas.removeEventListener('dirty', this._callDirtyHandler);
         }
+
+        if (!this.props.width || !this.props.height) {
+            window.removeEventListener('resize', this._callScrollHandler);
+        }
+    }
+
+    handleScroll() {
+        this.scaleCanvas();
     }
 
     handleDirty(e) {
         this.props.onDirty(e);
     }
 
-    calculateDimensions() {
-        let width = this.props.width;
-        let height = this.props.height;
+    fromDataURL(ctx, dataURL, dimensions) {
+        const image = new Image();
+        const width = dimensions.width / dimensions.ratio;
+        const height = dimensions.height / dimensions.ratio;
 
-        if (!width && this.wrapper) {
-            width = this.wrapper.offsetWidth;
+        image.src = dataURL;
+        image.onload = () => ctx.drawImage(image, 0, 0, width, height);
+    }
+
+    scaleCanvas() {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        let width = (this.props.width || this._canvas.offsetWidth) * ratio;
+        let height = (this.props.height || this._canvas.offsetHeight) * ratio;
+
+        let data;
+        if (this._sketcher) {
+            data = this._sketcher.toImage();
         }
 
-        if (!height && this.wrapper) {
-            height = this.wrapper.offsetHeight;
-        }
+        this._canvas.width = width;
+        this._canvas.height = height;
 
-        this.setState({width, height});
+        const ctx = this._canvas.getContext('2d');
+        ctx.scale(ratio, ratio);
+
+        if (this._sketcher) {
+            this.fromDataURL(ctx, data, {width, height, ratio});
+        }
     }
 
     clear() {
@@ -89,17 +127,7 @@ class Sketcher extends Component {
     }
 
     render() {
-        return (
-            <div
-                style={{
-                    width: this.props.width ? `${this.props.width}px` : '100%',
-                    height: this.props.height ? `${this.props.height}px` : '100%'
-                }}
-                ref={ref => this.wrapper = ref}
-            >
-                <canvas width={this.state.width} height={this.state.height} ref={ref => this.canvas = ref} />
-            </div>
-        );
+        return <canvas ref={ref => this._canvas = ref} />;
     }
 
 }

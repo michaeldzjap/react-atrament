@@ -5,7 +5,7 @@ import Control from './Control';
 class Controls extends Component {
 
     handleClear() {
-
+        
     }
 
     handleThickness() {
