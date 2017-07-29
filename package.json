@@ -16,8 +16,8 @@
         "stats:prod": "cross-env NODE_ENV=production node -r babel-register node_modules/webpack/bin/webpack.js --profile --json > stats.production.json --config=webpack.config.production.js"
     },
     "keywords": [
-        "pdf.js",
-        "react"
+        "react",
+        "atrament"
     ],
     "author": "Michael Dzjaparidze",
     "license": "ISC",
