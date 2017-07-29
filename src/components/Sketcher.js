@@ -16,7 +16,6 @@ class Sketcher extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {width: props.width, height: props.height};
         this._callDirtyHandler = this.handleDirty.bind(this);
         this._callScrollHandler = debounce(150, this.handleScroll.bind(this));
     }
