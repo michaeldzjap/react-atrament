@@ -60,7 +60,7 @@ class Sketcher extends Component {
         this.props.onDirty(e);
     }
 
-    fromDataURL(ctx, dataURL, dimensions) {
+    static fromDataURL(ctx, dataURL, dimensions) {
         const image = new Image();
         const width = dimensions.width / dimensions.ratio;
         const height = dimensions.height / dimensions.ratio;
@@ -86,7 +86,7 @@ class Sketcher extends Component {
         ctx.scale(ratio, ratio);
 
         if (this._sketcher) {
-            this.fromDataURL(ctx, data, {width, height, ratio});
+            this.constructor.fromDataURL(ctx, data, {width, height, ratio});
         }
     }
 
@@ -94,12 +94,24 @@ class Sketcher extends Component {
         this._sketcher.clear();
     }
 
+    get weight() {
+        return this._sketcher.weight;
+    }
+
     set weight(weight) {
         this._sketcher.weight = weight;     // in pixels
     }
 
+    get colour() {
+        return this._sketcher.color;
+    }
+
     set colour(colour) {
         this._sketcher.color = colour;
+    }
+
+    get mode() {
+        return this._sketcher.mode;
     }
 
     set mode(mode) {
@@ -110,8 +122,16 @@ class Sketcher extends Component {
         this._sketcher.mode = mode;
     }
 
+    get smoothing() {
+        return this._sketcher.smoothing;
+    }
+
     set smoothing(smoothing) {
         this._sketcher.smoothing = !!smoothing;
+    }
+
+    get adaptiveStroke() {
+        return this._sketcher.adaptiveStroke;
     }
 
     set adaptiveStroke(adaptiveStroke) {
@@ -124,6 +144,10 @@ class Sketcher extends Component {
         }
 
         this._sketcher.opacity = opacity;
+    }
+
+    get dirty() {
+        return this._sketcher.dirty;
     }
 
     render() {
